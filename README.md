@@ -1,12 +1,23 @@
-# React + Vite
+# Personality Survey 問卷
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+這是基於 React CDN + Tailwind CSS 所構建的靜態問卷系統，可直接透過 GitHub Pages 發佈。
 
-Currently, two official plugins are available:
+## 使用方式
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1. 將 `docs/` 資料夾內容上傳至 GitHub repository。
+2. 在 GitHub 中啟用 Pages：
+   - 設定 branch 為 `main`
+   - 選擇資料夾為 `/docs`
+3. 網站會自動部署於 `https://你的帳號.github.io/你的repo名稱/`
 
-## Expanding the ESLint configuration
+## 技術特性
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- 使用 React 18（CDN 版）
+- Tailwind CSS CDN 快速樣式
+- 問卷支援多選與結果顯示
+- 無需安裝任何套件或編譯工具
+
+## 後續擴充
+
+- 可接資料庫、Google Sheets、或寄出 email
+- 可分析結果並轉換為個人特質檔案
