@@ -89,14 +89,18 @@
     function Survey() {
       const [step, setStep] = React.useState(0);
       const [answers, setAnswers] = React.useState({});
+      const [error, setError] = React.useState("");
       const current = questions[step];
       const isDone = step >= questions.length;
 
       const handleAnswer = (id, value) => {
         const currentValues = answers[id] || [];
-        const newValues = currentValues.includes(value)
-          ? currentValues.filter(v => v !== value)
-          : [...currentValues, value];
+        let newValues = [...currentValues];
+        if (newValues.includes(value)) {
+          newValues = newValues.filter(v => v !== value);
+        } else {
+          newValues.push(value); // 保持順序
+        }
         setAnswers({ ...answers, [id]: newValues });
       };
 
@@ -105,36 +109,55 @@
           {!isDone ? (
             <React.Fragment>
               <h2 className="text-xl font-semibold mb-2">{current.question}</h2>
-              <p className="text-sm text-gray-500 mb-4">（可複選，點擊可切換）</p>
+              <p className="text-sm text-gray-500 mb-4">（可複選，點擊可切換，選取順序將被記錄）</p>
               <div className="flex flex-wrap gap-2 mb-2">
-                {current.options.map((opt, i) => (
-                  <button
-                    key={i}
-                    className={
-                      "min-w-[150px] px-4 py-2 rounded border text-sm transition-colors " +
-                      ((answers[current.id] && answers[current.id].includes(opt.value))
-                        ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-700"
-                        : "bg-white text-gray-800 border border-gray-300 hover:bg-gray-100")
-                    }
-                    onClick={() => handleAnswer(current.id, opt.value)}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
+                {current.options.map((opt, i) => {
+                  const selectedIndex = answers[current.id] ? answers[current.id].indexOf(opt.value) : -1;
+                  const isSelected = selectedIndex >= 0;
+                  return (
+                    <button
+                      key={i}
+                      className={
+                        "min-w-[150px] px-4 py-2 rounded border text-sm relative transition-colors " +
+                        (isSelected
+                          ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-700"
+                          : "bg-white text-gray-800 border border-gray-300 hover:bg-gray-100")
+                      }
+                      onClick={() => handleAnswer(current.id, opt.value)}
+                    >
+                      {opt.label}
+                      {isSelected && (
+                        <span className="absolute -top-2 -right-2 bg-white text-blue-600 border border-blue-600 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
+                          {isSelected ? selectedIndex + 1 : ''}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
               <p className="text-xs text-gray-500">
                 已選擇：{answers[current.id] ? answers[current.id].length : 0} 項
               </p>
+              {error && (
+                <p className="text-red-500 text-sm text-center mt-2">{error}</p>
+              )}
               <button
                 className="mt-4 px-4 py-2 border rounded bg-gray-100 hover:bg-gray-200"
-                onClick={() => setStep(step + 1)}
+                onClick={() => {
+                  if (!answers[current.id] || answers[current.id].length === 0) {
+                    setError("請至少選擇一個選項後再進行下一題");
+                    return;
+                  }
+                  setError("");
+                  setStep(step + 1);
+                }}
               >
                 下一題
               </button>
             </React.Fragment>
           ) : (
             <div>
-              <h2 className="text-xl font-semibold mb-2">✅ 測驗完成！</h2>
+              <h2 className="text-xl font-semibold mb-2">✅ 測驗完成！（含選擇順序）</h2>
               <pre className="bg-gray-100 p-2 rounded text-sm whitespace-pre-wrap">
                 {JSON.stringify(answers, null, 2)}
               </pre>
