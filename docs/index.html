@@ -14,86 +14,22 @@
   <div id="root" class="max-w-xl mx-auto mt-10 p-4"></div>
 
   <script type="text/babel">
-    const questions = [
-  {
-    id: "thinking_style",
-    question: "我在面對問題時，通常會先：",
-    options: [
-      { label: "分析原因並邏輯推演", value: "理性" },
-      { label: "感受整體氛圍與情緒", value: "感性" },
-      { label: "找人討論並聽取意見", value: "社交取向" },
-      { label: "先嘗試行動、從做中找方向", value: "實作派" }
-    ]
-  },
-  {
-    id: "feedback_attitude",
-    question: "當有人給我建議或批評時，我通常：",
-    options: [
-      { label: "馬上檢討自己是否真的需要調整", value: "內省型" },
-      { label: "先聽完再做判斷，不會馬上反應", value: "觀察型" },
-      { label: "會直接解釋或為自己辯護", value: "防衛型" },
-      { label: "當下不表現出來，但之後會影響情緒", value: "延遲反應型" }
-    ]
-  },
-  {
-    id: "low_energy_state",
-    question: "當我感到沒動力或狀態不好時，我傾向：",
-    options: [
-      { label: "主動請假或尋求喘息空間", value: "調節型" },
-      { label: "照樣工作但效率變低", value: "隱性消耗型" },
-      { label: "裝作沒事強撐到結束", value: "壓力偽裝型" },
-      { label: "會拖延並主動閃避工作", value: "逃避型" }
-    ]
-  },
-  {
-    id: "task_focus",
-    question: "當事情變多時，我通常會：",
-    options: [
-      { label: "會列清單並排優先順序", value: "條理型" },
-      { label: "先處理最有感的，靠當下節奏走", value: "直覺型" },
-      { label: "優先處理別人交代的任務", value: "服從型" },
-      { label: "全部都想做，常同時開好幾件事", value: "多線型" }
-    ]
-  },
-  {
-    id: "detail_handling",
-    question: "對於細節，我的態度是：",
-    options: [
-      { label: "會特別注意並反覆確認", value: "細心" },
-      { label: "只要大方向對就好，不糾結小錯", value: "大略型" },
-      { label: "做事情時常被小細節卡住", value: "細節敏感型" },
-      { label: "會委託他人處理細節，自己看整體", value: "分工導向" }
-    ]
-  },
-  {
-    id: "habit_behavior",
-    question: "在會議或工作中，我有什麼小習慣？",
-    options: [
-      { label: "會邊聽邊做筆記／畫圖", value: "視覺輸出型" },
-      { label: "會不自覺轉筆、晃腳等小動作", value: "身體觸發型" },
-      { label: "大多時間安靜專注、不太有額外動作", value: "靜態專注型" },
-      { label: "若有聯絡訊息時，會優先查看以確保即時回應", value: "即時回應型" }
-    ]
-  },
-  {
-    id: "message_response",
-    question: "對於訊息通知的反應，我通常：",
-    options: [
-      { label: "秒讀秒回，保持即時互動", value: "反應快" },
-      { label: "看到先想一想，有空再回", value: "延遲型" },
-      { label: "已讀不回，但會記得內容並處理", value: "靜默行動型" },
-      { label: "常常沒看到或需要提醒", value: "注意力薄弱型" }
-    ]
-  }
-];
-
     function Survey() {
       const [step, setStep] = React.useState(0);
+      const [questions, setQuestions] = React.useState([]);
       const [answers, setAnswers] = React.useState({});
       const [error, setError] = React.useState("");
       const [name, setName] = React.useState("");
       const [ext, setExt] = React.useState("");
       const [hasStarted, setHasStarted] = React.useState(false);
+
+      React.useEffect(() => {
+        fetch("questions.json")
+          .then(res => res.json())
+          .then(setQuestions)
+          .catch(() => alert("❌ 無法載入題庫"));
+      }, []);
+
       const current = questions[step];
       const isDone = step >= questions.length;
 
@@ -150,11 +86,15 @@
         );
       }
 
+      if (questions.length === 0) {
+        return <div className="text-center text-gray-500">📦 正在載入題庫...</div>;
+      }
+
       return (
         <div className="bg-white p-6 rounded-2xl shadow-lg">
           {!isDone ? (
             <React.Fragment>
-              <h2 className="text-xl font-semibold mb-2">{current.question}</h2>
+              <h2 className="text-xl font-semibold mb-2">{current.title}</h2>
               <p className="text-sm text-gray-500 mb-4">（可複選，點擊可切換，選取順序將被記錄）</p>
               <div className="flex flex-wrap gap-2 mb-2">
                 {current.options.map((opt, i) => {
@@ -233,7 +173,6 @@
                   送出問卷
                 </button>
               </div>
-
             </div>
           )}
         </div>
